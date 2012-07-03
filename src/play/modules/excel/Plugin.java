@@ -25,7 +25,6 @@ package play.modules.excel;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -33,7 +32,6 @@ import org.apache.commons.codec.net.URLCodec;
 
 import play.PlayPlugin;
 import play.exceptions.UnexpectedException;
-import play.mvc.Http.Header;
 import play.mvc.Http.Request;
 import play.mvc.Http.Response;
 import play.mvc.Scope.RenderArgs;
@@ -54,31 +52,6 @@ public class Plugin extends PlayPlugin {
         if (!p_.matcher(file.getName()).matches()) return null;
         if (null == templateLoader) return new ExcelTemplate(file);
         return templateLoader.loadTemplate(file);
-    }
-    
-    
-    private static Pattern pIE678_ = Pattern.compile(".*MSIE\\s+[6|7|8]\\.0.*");
-    /**
-     * Extend play format processing
-     */
-    @Override
-    public void beforeActionInvocation(Method actionMethod) {
-        Request request = Request.current();
-        Header h = request.headers.get("user-agent");
-        if (null == h) return;
-        String userAgent = h.value();
-        if (pIE678_.matcher(userAgent).matches()) return; // IE678 is tricky!, IE678 is buggy, IE678 is evil!
-        if (request.headers.get("accept") != null) {
-            String accept = request.headers.get("accept").value();
-            if (accept.indexOf("text/csv") != -1)
-                request.format = "csv";
-            if (accept
-                    .matches(".*application\\/(excel|vnd\\.ms\\-excel|x\\-excel|x\\-msexcel).*"))
-                request.format = "xls";
-            if (accept
-                    .indexOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") != -1)
-                request.format = "xlsx";
-        }
     }
     
     /*
